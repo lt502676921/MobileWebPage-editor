@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from "vue";
-import type { TemplateProps } from "../store";
+import type { TemplateProps } from "../store/templates";
 const props = defineProps({
   list: {
     type: Array as PropType<TemplateProps[]>,

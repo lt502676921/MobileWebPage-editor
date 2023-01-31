@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue";
 import type { TemplateProps } from "../store/templates";
-const props = defineProps({
+defineProps({
   list: {
     type: Array as PropType<TemplateProps[]>,
     required: true,
@@ -115,15 +115,16 @@ const props = defineProps({
   top: 0;
   width: 100%;
   height: 100%;
-  display: none;
-  background: rgba(0, 0, 0, 0.8);
+  display: none !important;
+  /* background: rgba(0, 0, 0, 0.8); */
   align-items: center;
   justify-content: center;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
 }
 .poster-item:hover .hover-item {
-  display: flex;
+  display: flex !important;
+  background: rgba(0, 0, 0, 0.8);
 }
 .poster-item:hover img {
   transform: scale(1.25);

@@ -1,40 +1,36 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 import GText from "./GText.vue";
 
-export default defineComponent({
-  props: {
-    list: {
-      type: Array,
-      required: true,
-    },
-  },
-  emits: ["on-item-click"],
-  name: "components-list",
-  components: {
-    GText,
-  },
-  setup(props, context) {
-    const onItemClick = (data: any) => {
-      context.emit("on-item-click", data);
-    };
-    return {
-      onItemClick,
-    };
+defineProps({
+  list: {
+    type: Array,
+    required: true,
   },
 });
+
+const emit = defineEmits(["on-item-click"]);
+
+const onItemClick = (data: any) => {
+  emit("on-item-click", data);
+};
 </script>
 
 <template>
   <div class="create-component-list">
-    <div
-      v-for="(item, index) in list"
-      :key="index"
-      class="component-item"
-      @click="onItemClick(item)"
-    >
-      <g-text v-bind="item"></g-text>
-    </div>
+    <a-tabs>
+      <a-tab-pane key="1">
+        <div
+          v-for="(item, index) in list"
+          :key="index"
+          class="component-item"
+          @click="onItemClick(item)"
+        >
+          <div class="component-wrapper">
+            <g-text v-bind="item"></g-text>
+          </div>
+        </div>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 

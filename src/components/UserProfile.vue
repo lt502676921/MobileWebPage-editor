@@ -6,7 +6,7 @@ import { message } from "ant-design-vue";
 import type { UserProps } from "../store/user";
 // import useCreateDesign from "../hooks/useCreateDesign";
 
-const props = defineProps({
+defineProps({
   user: {
     type: Object as PropType<UserProps>,
     required: true,

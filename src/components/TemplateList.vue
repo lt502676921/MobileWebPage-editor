@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue";
 import type { TemplateProps } from "../store/templates";
+
 defineProps({
   list: {
     type: Array as PropType<TemplateProps[]>,
@@ -13,7 +14,7 @@ defineProps({
   <div class="template-list-component">
     <a-row :gutter="16">
       <a-col :span="6" v-for="item in list" :key="item.id" class="poster-item">
-        <router-link :to="{ name: 'template', params: { id: item.id } }">
+        <router-link :to="{ name: 'TemplateDetail', params: { id: item.id } }">
           <a-card hoverable>
             <template v-slot:cover>
               <img :src="item.coverImg" v-if="item.coverImg" />

@@ -103,9 +103,6 @@ export default defineComponent({
 </template>
 
 <style>
-.editor {
-  height: 1200px;
-}
 .header {
   display: flex;
   justify-content: space-between;
@@ -128,7 +125,7 @@ export default defineComponent({
 .preview-container {
   padding: 24px;
   margin: 0;
-  min-height: 90vh;
+  min-height: 90vh !important;
   display: flex;
   flex-direction: column;
   align-items: center;

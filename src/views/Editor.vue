@@ -1,6 +1,5 @@
 <!-- <script lang="ts" setup>
 import { computed } from "vue";
-import { useStore } from "vuex";
 import type { GlobalDataProps } from "@/store";
 
 import GText from "../components/GText.vue";
@@ -11,13 +10,13 @@ const components = computed(() => store.state.editor.components);
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useStore } from "vuex";
-import type { GlobalDataProps } from "@/store";
+import { useEditorStore } from "../stores/editor";
+import type { GlobalDataProps } from "@/stores";
+import type { ComponentData } from "../stores/editor";
+import { defaultTextTemplates } from "@/defaultTemplates";
 import GText from "../components/GText.vue";
 import ComponentsList from "@/components/ComponentsList.vue";
 import EditWrapper from "@/components/EditWrapper.vue";
-import type { ComponentData } from "../store/editor";
-import { defaultTextTemplates } from "@/defaultTemplates";
 import PropsTable from "@/components/PropsTable.vue";
 // import PropsTable from "@/components/PropsTable";
 
@@ -29,30 +28,28 @@ export default defineComponent({
     PropsTable,
   },
   setup() {
-    const store = useStore<GlobalDataProps>();
-    const components = computed(() => store.state.editor.components);
-    const currentElement = computed<ComponentData | null>(
-      () => store.getters.getCurrentElement
-    );
+    const editorStore = useEditorStore();
+    const components = computed(() => editorStore.components);
+    const currentElement = computed(() => editorStore.getCurrentElement);
 
     const addItem = (props: any) => {
-      store.commit("addComponent", props);
+      editorStore.addComponent(props);
     };
 
     const setActive = (id: string) => {
-      store.commit("setActive", id);
+      editorStore.setActive(id);
     };
 
     const handleChange = (e: any) => {
-      store.commit("updateComponent", e);
+      editorStore.updateComponent(e);
     };
 
     return {
       components,
+      currentElement,
       defaultTextTemplates,
       addItem,
       setActive,
-      currentElement,
       handleChange,
     };
   },
@@ -96,7 +93,9 @@ export default defineComponent({
           :props="currentElement.props"
           @change="handleChange"
         ></props-table>
-        <pre>{{ currentElement && currentElement.props }}</pre>
+        <pre>
+          {{ currentElement && currentElement.props }}
+        </pre>
       </a-layout-sider>
     </a-layout>
   </div>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { useTemplatesStore } from "@/stores/templates";
+import type { GlobalDataProps } from "../stores";
 import TemplateList from "../components/TemplateList.vue";
-import { useStore } from "vuex";
-import { computed } from "@vue/runtime-core";
-import type { GlobalDataProps } from "../store";
+import { computed } from "vue";
 
-const store = useStore<GlobalDataProps>();
-const testData = computed(() => store.state.templates.data);
+const templatesStore = useTemplatesStore();
+const testData = computed(() => templatesStore.data);
 </script>
 
 <template>

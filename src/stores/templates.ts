@@ -1,4 +1,4 @@
-import type { Module } from "vuex";
+import { defineStore } from "pinia";
 import type { GlobalDataProps } from "./index";
 
 export interface TemplateProps {
@@ -64,15 +64,13 @@ export interface TemplatesProps {
   data: TemplateProps[];
 }
 
-const templates: Module<TemplatesProps, GlobalDataProps> = {
-  state: {
-    data: testData,
+export const useTemplatesStore = defineStore("templates", {
+  state: () => {
+    return { data: testData };
   },
   getters: {
     getTemplateById: (state) => (id: number) => {
       return state.data.find((t) => t.id === id);
     },
   },
-};
-
-export default templates;
+});

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { GlobalDataProps } from "@/store";
-import type { TemplateProps } from "../store/templates";
-import { computed } from "@vue/runtime-core";
 import { useRoute } from "vue-router";
-import { useStore } from "vuex";
+import { useTemplatesStore } from "../stores/templates";
+import type { GlobalDataProps } from "@/stores";
+import type { TemplateProps } from "../stores/templates";
+import { computed } from "vue";
 
-const store = useStore<GlobalDataProps>();
+const templatesStore = useTemplatesStore();
 const route = useRoute();
 const currentId = route.params.id as string;
-const template = computed<TemplateProps>(() =>
-  store.getters.getTemplateById(parseInt(currentId))
+const template = computed(() =>
+  templatesStore.getTemplateById(parseInt(currentId))
 );
 </script>
 

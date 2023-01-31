@@ -1,6 +1,6 @@
-import type { TextComponentProps } from "@/defaultProps";
+import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
-import type { Module } from "vuex";
+import type { TextComponentProps } from "@/defaultProps";
 import type { GlobalDataProps } from ".";
 
 export interface EditorProps {
@@ -21,7 +21,7 @@ export const testComponents: ComponentData[] = [
     props: {
       text: "hello",
       fontSize: "20px",
-      color: "red",
+      color: "#1890ff",
       lineHeight: "1",
       textAlign: "left",
       fontFamily: "",
@@ -51,26 +51,26 @@ export const testComponents: ComponentData[] = [
   },
 ];
 
-const editor: Module<EditorProps, GlobalDataProps> = {
-  state: {
-    components: testComponents,
-    currentElement: "",
+export const useEditorStore = defineStore("editor", {
+  state: () => {
+    return { components: testComponents, currentElement: "" };
   },
-  mutations: {
-    addComponent(state, props: Partial<TextComponentProps>) {
+
+  actions: {
+    addComponent(props: Partial<TextComponentProps>) {
       const newComponent: ComponentData = {
         id: uuidv4(),
         name: "g-text",
         props,
       };
-      state.components.push(newComponent);
+      this.components.push(newComponent);
     },
-    setActive(state, currentId: string) {
-      state.currentElement = currentId;
+    setActive(currentId: string) {
+      this.currentElement = currentId;
     },
-    updateComponent(state, { key, value }) {
-      const updateComponent = state.components.find(
-        (component) => component.id === state.currentElement
+    updateComponent({ key, value }) {
+      const updateComponent = this.components.find(
+        (component) => component.id === this.currentElement
       );
       if (updateComponent) {
         updateComponent.props[key as keyof TextComponentProps] = value;
@@ -84,6 +84,4 @@ const editor: Module<EditorProps, GlobalDataProps> = {
       );
     },
   },
-};
-
-export default editor;
+});

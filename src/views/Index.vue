@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from "@vue/runtime-core";
 import { RouterLink, RouterView } from "vue-router";
-import { useStore } from "vuex";
-import type { GlobalDataProps } from "../store";
+import { useUserStore } from "@/stores/user";
+import type { GlobalDataProps } from "../stores";
 import UserProfile from "../components/UserProfile.vue";
+import { computed } from "vue";
 
-const store = useStore<GlobalDataProps>();
-const userInfo = computed(() => store.state.user);
+const userStore = useUserStore();
+const userInfo = computed(() => userStore.user);
 </script>
 
 <template>

@@ -1,22 +1,27 @@
-<!-- <script lang="ts" setup>
-import { computed } from "vue";
-import { pick } from "lodash-es";
+<script lang="ts">
+const defaultProps = transformToComponentProps(textDefaultProps);
+</script>
+
+<script lang="ts" setup>
 import {
   transformToComponentProps,
   textDefaultProps,
   textStylePropNames,
 } from "@/defaultProps";
-const defaultProps = transformToComponentProps(textDefaultProps);
+import useComponentCommon from "@/hooks/useComponentCommon";
 
 const props = defineProps({
   tag: { type: String, default: "div" },
   ...defaultProps,
 });
 
-const styleProps = computed(() => pick(props, textStylePropNames));
-</script> -->
+const { styleProps, handleClick } = useComponentCommon(
+  props,
+  textStylePropNames
+);
+</script>
 
-<script lang="ts">
+<!-- <script lang="ts">
 import { defineComponent } from "vue";
 import {
   transformToComponentProps,
@@ -43,7 +48,7 @@ export default defineComponent({
     };
   },
 });
-</script>
+</script> -->
 
 <template>
   <component

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
-import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
-import type { UserProps } from "../store/user";
+import { useUserStore } from "../stores/user";
+import type { UserProps } from "../stores/user";
 // import useCreateDesign from "../hooks/useCreateDesign";
 
 defineProps({
@@ -17,17 +17,17 @@ defineProps({
   // },
 });
 
-const store = useStore();
+const userStore = useUserStore();
 const router = useRouter();
 // const createDesign = useCreateDesign();
 
 const login = () => {
-  store.commit("login");
+  userStore.login();
   message.success("登录成功", 2);
 };
 
 const logout = () => {
-  store.commit("logout");
+  userStore.logout();
   message.success("退出登录成功，2秒后跳转到首页", 2);
   setTimeout(() => {
     router.push("/");

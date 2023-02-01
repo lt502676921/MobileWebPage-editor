@@ -1,81 +1,18 @@
 <script lang="ts">
-import { computed, type PropType, type VNode } from "vue";
-import { reduce } from "lodash-es";
-import type { TextComponentProps } from "@/defaultProps";
-import { mapPropsToForms, type PropsToForms } from "@/propsMap";
-import RenderVnode from "./RenderVnode";
 import ColorPicker from "./ColorPicker.vue";
-
-interface FormProps {
-  component: string;
-  subComponent?: string;
-  value: string;
-  extraProps?: { [key: string]: any };
-  text?: string;
-  options?: { text: string | VNode; value: any }[];
-  valueProp: string;
-  eventName: string;
-  events: { [key: string]: (e: any) => void };
-}
-
 export default {
   components: {
-    RenderVnode,
     ColorPicker,
-  },
-  props: {
-    props: { type: Object as PropType<TextComponentProps>, required: true },
-  },
-  emits: ["change"],
-  setup(props, context) {
-    const finalProps = computed(() => {
-      return reduce(
-        props.props,
-        (result, value, key) => {
-          const newKey = key as keyof TextComponentProps;
-          const item = mapPropsToForms[newKey];
-          if (item) {
-            const {
-              valueProp = "value",
-              eventName = "change",
-              initalTransform,
-              afterTransform,
-            } = item;
-            const newItem: FormProps = {
-              ...item,
-              value: initalTransform ? initalTransform(value) : value,
-              valueProp,
-              eventName,
-              events: {
-                [eventName]: (e: any) => {
-                  context.emit("change", {
-                    key,
-                    value: afterTransform ? afterTransform(e) : e,
-                  });
-                },
-              },
-            };
-            result[newKey] = newItem;
-          }
-          return result;
-        },
-        {} as { [key: string]: FormProps }
-      );
-    });
-    return {
-      finalProps,
-    };
   },
 };
 </script>
 
-<!-- <script lang="ts" setup>
+<script lang="ts" setup>
 import { computed, type PropType, type VNode } from "vue";
 import { reduce } from "lodash-es";
 import type { TextComponentProps } from "@/defaultProps";
 import { mapPropsToForms, type PropsToForms } from "@/propsMap";
 import RenderVnode from "./RenderVnode";
-import ColorPicker from "./ColorPicker.vue";
 
 interface FormProps {
   component: string;
@@ -129,7 +66,7 @@ const finalProps = computed(() => {
     {} as { [key: string]: FormProps }
   );
 });
-</script> -->
+</script>
 
 <template>
   <div class="props-table">

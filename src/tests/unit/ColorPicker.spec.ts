@@ -6,6 +6,7 @@ import ColorPicker from "@/components/ColorPicker.vue";
 const defaultColors = [
   "#ffffff",
   "#f5222d",
+  "#fa541c",
   "#fadb14",
   "#52c41a",
   "#1890ff",

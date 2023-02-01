@@ -1,59 +1,39 @@
-<!-- <script lang="ts" setup>
-import { computed } from "vue";
-import type { GlobalDataProps } from "@/store";
-
-import GText from "../components/GText.vue";
-
-const store = useStore<GlobalDataProps>();
-const components = computed(() => store.state.editor.components);
-</script> -->
-
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import GText from "../components/GText.vue";
+export default {
+  components: {
+    GText,
+  },
+};
+</script>
+
+<script lang="ts" setup>
+import { computed } from "vue";
 import { useEditorStore } from "../stores/editor";
 import type { GlobalDataProps } from "@/stores";
 import type { ComponentData } from "../stores/editor";
 import { defaultTextTemplates } from "@/defaultTemplates";
-import GText from "../components/GText.vue";
+
 import ComponentsList from "@/components/ComponentsList.vue";
 import EditWrapper from "@/components/EditWrapper.vue";
 import PropsTable from "@/components/PropsTable.vue";
 // import PropsTable from "@/components/PropsTable";
 
-export default defineComponent({
-  components: {
-    GText,
-    ComponentsList,
-    EditWrapper,
-    PropsTable,
-  },
-  setup() {
-    const editorStore = useEditorStore();
-    const components = computed(() => editorStore.components);
-    const currentElement = computed(() => editorStore.getCurrentElement);
+const editorStore = useEditorStore();
+const components = computed(() => editorStore.components);
+const currentElement = computed(() => editorStore.getCurrentElement);
 
-    const addItem = (props: any) => {
-      editorStore.addComponent(props);
-    };
+const addItem = (props: any) => {
+  editorStore.addComponent(props);
+};
 
-    const setActive = (id: string) => {
-      editorStore.setActive(id);
-    };
+const setActive = (id: string) => {
+  editorStore.setActive(id);
+};
 
-    const handleChange = (e: any) => {
-      editorStore.updateComponent(e);
-    };
-
-    return {
-      components,
-      currentElement,
-      defaultTextTemplates,
-      addItem,
-      setActive,
-      handleChange,
-    };
-  },
-});
+const handleChange = (e: any) => {
+  editorStore.updateComponent(e);
+};
 </script>
 
 <template>

@@ -18,6 +18,7 @@ import ComponentsList from "@/components/ComponentsList.vue";
 import EditWrapper from "@/components/EditWrapper.vue";
 import PropsTable from "@/components/PropsTable.vue";
 // import PropsTable from "@/components/PropsTable";
+import StyledUploader from "@/components/StyledUploader.vue";
 
 const editorStore = useEditorStore();
 const components = computed(() => editorStore.components);
@@ -45,6 +46,7 @@ const handleChange = (e: any) => {
           :list="defaultTextTemplates"
           @onItemClick="addItem"
         ></components-list>
+        <StyledUploader></StyledUploader>
       </a-layout-sider>
       <a-layout style="padding: 0 24px 24px">
         <a-layout-content class="preview-container">

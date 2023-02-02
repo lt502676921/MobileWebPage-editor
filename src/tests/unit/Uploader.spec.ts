@@ -189,4 +189,71 @@ describe("Uploader component", () => {
     expect(firstItem.get(".filename").text()).toBe("new_name.docx");
     spyPost.mockRestore();
   });
+  test("testing drag and drop function", async () => {
+    const spyPost = vi
+      .spyOn(mockedAxios, "post")
+      .mockResolvedValueOnce({ data: { url: "dummy.url" } });
+    const wrapper = shallowMount(Uploader, {
+      props: {
+        action: "test.url",
+        drag: true,
+      },
+    });
+    const uploadArea = wrapper.get(".upload-area");
+    await uploadArea.trigger("dragover");
+    expect(uploadArea.classes()).toContain("is-dragover");
+    await uploadArea.trigger("dragleave");
+    expect(uploadArea.classes()).not.toContain("is-dragover");
+    await uploadArea.trigger("drop", { dataTransfer: { files: [testFile] } });
+    expect(mockedAxios.post).toHaveBeenCalled();
+    await flushPromises();
+    expect(wrapper.findAll("li").length).toBe(1);
+    spyPost.mockRestore();
+  });
+  test("testing manual upload process", async () => {
+    const spyPost = vi
+      .spyOn(mockedAxios, "post")
+      .mockResolvedValueOnce({ data: { url: "dummy.url" } });
+    const wrapper = shallowMount(Uploader, {
+      props: {
+        action: "test.url",
+        drag: true,
+        autoUpload: false,
+      },
+    });
+    const fileInput = wrapper.get("input").element as HTMLInputElement;
+    setInputValue(fileInput);
+    await wrapper.get("input").trigger("change");
+    expect(wrapper.findAll("li").length).toBe(1);
+    const firstItem = wrapper.get("li:first-child");
+    expect(firstItem.classes()).toContain("upload-ready");
+    wrapper.vm.uploadFiles();
+    expect(mockedAxios.post).toHaveBeenCalled();
+    await flushPromises();
+    expect(firstItem.classes()).toContain("upload-success");
+    spyPost.mockRestore();
+  });
+  test("PictureList mode should works fine", async () => {
+    const spyPost = vi
+      .spyOn(mockedAxios, "post")
+      .mockResolvedValueOnce({ data: { url: "dummy.url" } });
+    window.URL.createObjectURL = vi.fn(() => {
+      return "test.url";
+    });
+    const wrapper = mount(Uploader, {
+      props: {
+        action: "test.url",
+        listType: "picture",
+      },
+    });
+    expect(wrapper.get("ul").classes()).toContain("upload-list-picture");
+    const fileInput = wrapper.get("input").element as HTMLInputElement;
+    setInputValue(fileInput);
+    await wrapper.get("input").trigger("change");
+    expect(wrapper.findAll("li").length).toBe(1);
+    expect(wrapper.find("li:first-child img").exists()).toBeTruthy();
+    const firstItem = wrapper.find("li:first-child img");
+    expect(firstItem.attributes("src")).toEqual("test.url");
+    spyPost.mockRestore();
+  });
 });

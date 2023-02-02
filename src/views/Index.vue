@@ -27,10 +27,6 @@ const userInfo = computed(() => userStore.user);
 </template>
 
 <style>
-.page-title {
-  color: #fff;
-}
-
 .header {
   display: flex;
   justify-content: space-between;

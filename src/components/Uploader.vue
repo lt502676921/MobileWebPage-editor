@@ -15,10 +15,12 @@ export interface UploadFile {
   name: string;
   status: UploadStatus;
   raw: File;
-  resp?: any;
+  response?: any;
+  url?: string;
 }
 
 export type UploadStatus = "ready" | "loading" | "success" | "error";
+type FileListType = "picture" | "text";
 type CheckUpload = (file: File) => boolean | Promise<File>;
 
 const props = defineProps({
@@ -29,44 +31,53 @@ const props = defineProps({
   beforeUpload: {
     type: Function as PropType<CheckUpload>,
   },
+  drag: {
+    type: Boolean,
+    default: false,
+  },
+  autoUpload: {
+    type: Boolean,
+    default: true,
+  },
+  listType: {
+    type: String as PropType<FileListType>,
+    default: "text",
+  },
 });
 
 const fileInput = ref<null | HTMLInputElement>(null);
-const fileStatus = ref<UploadStatus>("ready");
-const uploadedFiles = ref<UploadFile[]>([]);
+const fileList = ref<UploadFile[]>([]);
+const isDragOver = ref(false);
 const isUploading = computed(() => {
-  return uploadedFiles.value.some((file) => file.status === "loading");
+  return fileList.value.some((file) => file.status === "loading");
 });
 const lastFileData = computed(() => {
-  const lastFile = last(uploadedFiles.value);
+  const lastFile = last(fileList.value);
   if (lastFile) {
     return {
       loaded: lastFile.status === "success",
-      data: lastFile.resp,
+      data: lastFile.response,
     };
   }
   return false;
 });
+
 const removeFile = (id: string) => {
-  uploadedFiles.value = uploadedFiles.value.filter((file) => file.uid !== id);
+  fileList.value = fileList.value.filter((file) => file.uid !== id);
 };
+
 const triggerUpload = () => {
   if (fileInput.value) {
     fileInput.value.click();
   }
 };
-const postFile = (uploadedFile: File) => {
+
+const postFile = (readyFile: UploadFile) => {
   const formData = new FormData();
-  formData.append(uploadedFile.name, uploadedFile);
-  const fileObj = reactive<UploadFile>({
-    uid: uuidv4(),
-    size: uploadedFile.size,
-    name: uploadedFile.name,
-    status: "loading",
-    raw: uploadedFile,
-  });
-  uploadedFiles.value.push(fileObj);
-  fileStatus.value = "loading";
+  formData.append("file", readyFile.raw);
+  formData.append("filename", readyFile.name);
+  // formData.append(uploadedFile.name, uploadedFile);
+  readyFile.status = "loading";
   axios
     .post(props.action, formData, {
       headers: {
@@ -75,11 +86,11 @@ const postFile = (uploadedFile: File) => {
     })
     .then((res) => {
       console.log(res.data);
-      fileObj.status = "success";
-      fileObj.resp = res.data;
+      readyFile.status = "success";
+      readyFile.response = res.data;
     })
     .catch(() => {
-      fileObj.status = "error";
+      readyFile.status = "error";
     })
     .finally(() => {
       if (fileInput.value) {
@@ -87,9 +98,38 @@ const postFile = (uploadedFile: File) => {
       }
     });
 };
-const handleFileChange = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  const files = target.files;
+
+// addFileToList
+const addFileToList = (uploadedFile: File) => {
+  const fileObj = reactive<UploadFile>({
+    uid: uuidv4(),
+    size: uploadedFile.size,
+    name: uploadedFile.name,
+    status: "ready",
+    raw: uploadedFile,
+  });
+  if (props.listType === "picture") {
+    // URL.createObjectURL;
+    try {
+      fileObj.url = URL.createObjectURL(uploadedFile);
+    } catch (error) {
+      console.error("upload File error", error);
+    }
+
+    // FileReader
+    // const fileReader = new FileReader();
+    // fileReader.readAsDataURL(uploadedFile);
+    // fileReader.addEventListener("load", () => {
+    //   fileObj.url = fileReader.result as string;
+    // });
+  }
+  fileList.value.push(fileObj);
+  if (props.autoUpload) {
+    postFile(fileObj);
+  }
+};
+
+const beforeUploadCheck = (files: null | FileList) => {
   if (files) {
     const uploadedFile = files[0];
     if (props.beforeUpload) {
@@ -98,7 +138,7 @@ const handleFileChange = (e: Event) => {
         result
           .then((processedFile) => {
             if (processedFile instanceof File) {
-              postFile(processedFile);
+              addFileToList(processedFile);
             } else {
               throw new Error("beforeUpload Promise should return File object");
             }
@@ -107,18 +147,63 @@ const handleFileChange = (e: Event) => {
             console.error(e);
           });
       } else if (result === true) {
-        postFile(uploadedFile);
+        addFileToList(uploadedFile);
       }
     } else {
-      postFile(uploadedFile);
+      addFileToList(uploadedFile);
     }
   }
 };
+
+const uploadFiles = () => {
+  fileList.value
+    .filter((file) => file.status === "ready")
+    .forEach((readyFile) => postFile(readyFile));
+};
+
+let events: { [key: string]: (e: any) => void } = {
+  click: triggerUpload,
+};
+
+const handleFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  beforeUploadCheck(target.files);
+};
+
+const handleDrag = (e: DragEvent, over: boolean) => {
+  e.preventDefault();
+  isDragOver.value = over;
+};
+
+const handleDrop = (e: DragEvent) => {
+  e.preventDefault();
+  isDragOver.value = false;
+  if (e.dataTransfer) {
+    beforeUploadCheck(e.dataTransfer.files);
+  }
+};
+
+if (props.drag) {
+  events = {
+    ...events,
+    dragover: (e: DragEvent) => {
+      handleDrag(e, true);
+    },
+    dragleave: (e: DragEvent) => {
+      handleDrag(e, false);
+    },
+    drop: handleDrop,
+  };
+}
 </script>
 
 <template>
   <div class="file-upload">
-    <div class="upload-area" @click="triggerUpload">
+    <div
+      class="upload-area"
+      :class="{ 'is-dragover': drag && isDragOver }"
+      v-on="events"
+    >
       <slot name="loading" v-if="isUploading">
         <button class="btn btn-primary" disabled>正在上传</button>
       </slot>
@@ -139,12 +224,18 @@ const handleFileChange = (e: Event) => {
       :style="{ display: 'none' }"
       @change="handleFileChange"
     />
-    <ul class="upload-list">
+    <ul :class="`upload-list upload-list-${listType}`">
       <li
         :class="`uploaded-file upload-${file.status}`"
-        v-for="file in uploadedFiles"
+        v-for="file in fileList"
         :key="file.uid"
       >
+        <img
+          v-if="file.url && listType === 'picture'"
+          class="upload-list-thumbnail"
+          :src="file.url"
+          :alt="file.name"
+        />
         <span v-if="file.status === 'loading'" class="file-icon">
           <LoadingOutlined />
         </span>
@@ -176,24 +267,34 @@ const handleFileChange = (e: Event) => {
   &:first-child {
     margin-top: 10px;
   }
-}
-.file-icon {
-  svg {
-    margin-right: 5px;
-    color: rgba(0, 0, 0, 0.45);
+  .file-icon {
+    svg {
+      margin-right: 5px;
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+  .filename {
+    margin-left: 5px;
+    margin-right: 40px;
+  }
+  &.upload-error {
+    color: #f5222d;
+    svg {
+      color: #f5222d;
+    }
+  }
+  .file-status {
   }
 }
-.filename {
-  margin-left: 5px;
-  margin-right: 40px;
-}
-// &.upload-error {
-//   color: #f5222d;
-//   svg {
-//     color: #f5222d;
-//   }
-// }
-.file-status {
+.upload-list-thumbnail {
+  width: 70px;
+  height: 70px;
+  position: relative;
+  z-index: 1;
+  background-color: #fff;
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: cover;
 }
 
 .upload-loading {

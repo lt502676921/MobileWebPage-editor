@@ -1,8 +1,10 @@
 <script lang="ts">
 import GText from "../components/GText.vue";
+import GImage from "@/components/GImage.vue";
 export default {
   components: {
     GText,
+    GImage,
   },
 };
 </script>
@@ -18,14 +20,13 @@ import ComponentsList from "@/components/ComponentsList.vue";
 import EditWrapper from "@/components/EditWrapper.vue";
 import PropsTable from "@/components/PropsTable.vue";
 // import PropsTable from "@/components/PropsTable";
-import StyledUploader from "@/components/StyledUploader.vue";
 
 const editorStore = useEditorStore();
 const components = computed(() => editorStore.components);
 const currentElement = computed(() => editorStore.getCurrentElement);
 
-const addItem = (props: any) => {
-  editorStore.addComponent(props);
+const addItem = (component: any) => {
+  editorStore.addComponent(component);
 };
 
 const setActive = (id: string) => {
@@ -46,7 +47,6 @@ const handleChange = (e: any) => {
           :list="defaultTextTemplates"
           @onItemClick="addItem"
         ></components-list>
-        <StyledUploader></StyledUploader>
       </a-layout-sider>
       <a-layout style="padding: 0 24px 24px">
         <a-layout-content class="preview-container">

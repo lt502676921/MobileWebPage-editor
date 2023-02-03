@@ -1,5 +1,11 @@
 <script lang="ts" setup>
+import { v4 as uuidv4 } from "uuid";
+import { imageDefaultProps, type TextComponentProps } from "@/defaultProps";
+import type { ComponentData } from "@/stores/editor";
 import GText from "./GText.vue";
+import type { UploadResponse } from "@/extraType";
+import { message } from "ant-design-vue";
+import StyledUploader from "./StyledUploader.vue";
 
 defineProps({
   list: {
@@ -10,8 +16,26 @@ defineProps({
 
 const emit = defineEmits(["on-item-click"]);
 
-const onItemClick = (data: any) => {
-  emit("on-item-click", data);
+const onItemClick = (props: TextComponentProps) => {
+  const componentData: ComponentData = {
+    name: "g-text",
+    id: uuidv4(),
+    props,
+  };
+  emit("on-item-click", componentData);
+};
+
+const onImageUploaded = (response: UploadResponse) => {
+  const componentData: ComponentData = {
+    name: "g-image",
+    id: uuidv4(),
+    props: {
+      ...imageDefaultProps,
+    },
+  };
+  message.success("上传成功");
+  componentData.props.src = response.servicePath;
+  emit("on-item-click", componentData);
 };
 </script>
 
@@ -32,6 +56,7 @@ const onItemClick = (data: any) => {
       </a-tab-pane>
     </a-tabs>
   </div>
+  <StyledUploader @success="onImageUploaded"></StyledUploader>
 </template>
 
 <style>

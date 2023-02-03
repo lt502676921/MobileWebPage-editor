@@ -88,10 +88,11 @@ export const textDefaultProps = {
   // width: "318px",
 };
 
-// export const imageDefaultProps = {
-//   imageSrc: "",
-//   ...commonDefaultProps,
-// };
+export const imageDefaultProps: ImageComponentProps = {
+  src: "test.url",
+  ...commonDefaultProps,
+};
+
 // this contains all default props for all the components
 // useful for inserting new component into the store
 // export const componentsDefaultProps: DefaultPropsType = {
@@ -106,7 +107,7 @@ export const textDefaultProps = {
 //       top: 500 / 2 - 36 / 2 + "px",
 //     },
 //   },
-//   "l-image": {
+//   "g-image": {
 //     props: {
 //       ...imageDefaultProps,
 //     },
@@ -125,11 +126,15 @@ export const textStylePropNames = without(
   "url",
   "text"
 );
+export const imageStylePropNames = without(
+  Object.keys(imageDefaultProps),
+  "src"
+);
 
-export const transformToComponentProps = (props: TextComponentProps) => {
+export const transformToComponentProps = <T extends {}>(props: T) => {
   return mapValues(props, (item) => {
     return {
-      type: item.constructor as StringConstructor,
+      type: (item as any).constructor as StringConstructor,
       default: item,
     };
   });

@@ -45,6 +45,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["success"]);
+
 const fileInput = ref<null | HTMLInputElement>(null);
 const fileList = ref<UploadFile[]>([]);
 const isDragOver = ref(false);
@@ -88,6 +90,11 @@ const postFile = (readyFile: UploadFile) => {
       console.log(res.data);
       readyFile.status = "success";
       readyFile.response = res.data;
+      emit("success", {
+        response: res.data,
+        file: readyFile,
+        list: fileList.value,
+      });
     })
     .catch(() => {
       readyFile.status = "error";

@@ -43,6 +43,10 @@ const props = defineProps({
     type: String as PropType<FileListType>,
     default: "text",
   },
+  showUploadList: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(["success"]);
@@ -231,7 +235,7 @@ if (props.drag) {
       :style="{ display: 'none' }"
       @change="handleFileChange"
     />
-    <ul :class="`upload-list upload-list-${listType}`">
+    <ul :class="`upload-list upload-list-${listType}`" v-if="showUploadList">
       <li
         :class="`uploaded-file upload-${file.status}`"
         v-for="file in fileList"

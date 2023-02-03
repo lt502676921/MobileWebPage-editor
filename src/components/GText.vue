@@ -41,9 +41,9 @@ button.g-text-component {
   padding: 5px 10px;
   cursor: pointer;
 }
-.g-text-component {
+/* .g-text-component {
   box-sizing: border-box;
   white-space: pre-wrap;
   position: relative !important;
-}
+} */
 </style>

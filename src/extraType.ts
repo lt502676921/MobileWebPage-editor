@@ -2,6 +2,7 @@ export interface UploadResponse {
   code: number;
   message: string;
   data: {
-    url: string;
+    // url: string;
+    servicePath: string;
   };
 }

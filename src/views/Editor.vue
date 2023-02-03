@@ -36,6 +36,12 @@ const setActive = (id: string) => {
 const handleChange = (e: any) => {
   editorStore.updateComponent(e);
 };
+
+const updatePosition = (data: { left: number; top: number; id: string }) => {
+  const { left, top, id } = data;
+  editorStore.updateComponent({ key: "left", value: left + "px", id });
+  editorStore.updateComponent({ key: "top", value: top + "px", id });
+};
 </script>
 
 <template>
@@ -54,9 +60,11 @@ const handleChange = (e: any) => {
           <div class="preview-list" id="canvas-area">
             <edit-wrapper
               @setActive="setActive(component.id)"
+              @update-position="updatePosition"
               v-for="component in components"
               :key="component.id"
               :id="component.id"
+              :props="component.props"
               :active="component.id === (currentElement && currentElement.id)"
             >
               <component :is="component.name" v-bind="component.props" />

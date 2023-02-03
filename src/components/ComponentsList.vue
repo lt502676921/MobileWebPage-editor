@@ -6,6 +6,7 @@ import GText from "./GText.vue";
 import type { UploadResponse } from "@/extraType";
 import { message } from "ant-design-vue";
 import StyledUploader from "./StyledUploader.vue";
+import { getImageDimensions } from "@/helper";
 
 defineProps({
   list: {
@@ -25,7 +26,7 @@ const onItemClick = (props: TextComponentProps) => {
   emit("on-item-click", componentData);
 };
 
-const onImageUploaded = (response: UploadResponse) => {
+const onImageUploaded = (data: { response: UploadResponse; file: File }) => {
   const componentData: ComponentData = {
     name: "g-image",
     id: uuidv4(),
@@ -34,8 +35,12 @@ const onImageUploaded = (response: UploadResponse) => {
     },
   };
   message.success("上传成功");
-  componentData.props.src = response.servicePath;
-  emit("on-item-click", componentData);
+  componentData.props.src = data.response.servicePath;
+  getImageDimensions(data.file).then(({ width }) => {
+    const maxWidth = 373;
+    componentData.props.width = (width > maxWidth ? maxWidth : width) + "px";
+    emit("on-item-click", componentData);
+  });
 };
 </script>
 

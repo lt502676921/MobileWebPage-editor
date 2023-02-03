@@ -5,8 +5,8 @@ import { commonUploadCheck } from "../helper";
 
 const emit = defineEmits(["success"]);
 
-const handleUploadSuccess = (response: any) => {
-  emit("success", response);
+const handleUploadSuccess = (data: any) => {
+  emit("success", data);
 };
 </script>
 
@@ -18,7 +18,7 @@ const handleUploadSuccess = (response: any) => {
     :beforeUpload="commonUploadCheck"
     @success="
       (data) => {
-        handleUploadSuccess(data.response);
+        handleUploadSuccess({ response: data.response, file: data.file.raw });
       }
     "
   >

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
-import type { TextComponentProps } from "@/defaultProps";
+import type { ImageComponentProps, TextComponentProps } from "@/defaultProps";
 import type { GlobalDataProps } from ".";
 
 export interface EditorProps {
@@ -9,7 +9,7 @@ export interface EditorProps {
 }
 
 export interface ComponentData {
-  props: Partial<TextComponentProps>;
+  props: Partial<TextComponentProps | ImageComponentProps>;
   id: string;
   name: string;
 }
@@ -25,6 +25,12 @@ export const testComponents: ComponentData[] = [
       lineHeight: "1",
       textAlign: "left",
       fontFamily: "",
+      width: "100px",
+      height: "100px",
+      top: "10px",
+      left: "10px",
+      position: "absolute",
+      backgroundColor: "#cccccc",
     },
   },
   {
@@ -63,7 +69,7 @@ export const useEditorStore = defineStore("editor", {
     setActive(currentId: string) {
       this.currentElement = currentId;
     },
-    updateComponent({ key, value }) {
+    updateComponent({ key, value, id }) {
       const updateComponent = this.components.find(
         (component) => component.id === this.currentElement
       );

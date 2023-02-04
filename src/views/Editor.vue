@@ -11,6 +11,7 @@ export default {
 
 <script lang="ts" setup>
 import { computed } from "vue";
+import { pickBy, forEach } from "lodash-es";
 import { useEditorStore } from "../stores/editor";
 import type { GlobalDataProps } from "@/stores";
 import type { ComponentData } from "../stores/editor";
@@ -38,9 +39,11 @@ const handleChange = (e: any) => {
 };
 
 const updatePosition = (data: { left: number; top: number; id: string }) => {
-  const { left, top, id } = data;
-  editorStore.updateComponent({ key: "left", value: left + "px", id });
-  editorStore.updateComponent({ key: "top", value: top + "px", id });
+  const { id } = data;
+  const updatedData = pickBy<number>(data, (v, k) => k !== id);
+  forEach(updatedData, (v, key) => {
+    editorStore.updateComponent({ key, value: v + "px", id });
+  });
 };
 </script>
 

@@ -45,7 +45,7 @@ let isMoving = false;
 const calculateMovePosition = (e: MouseEvent) => {
   const container = document.getElementById("canvas-area") as HTMLElement;
   const left = e.clientX - gap.x - container.offsetLeft;
-  const top = e.clientY - gap.y - container.offsetTop;
+  const top = e.clientY - gap.y - container.offsetTop + container.scrollTop;
   return { left, top };
 };
 const calculateSize = (
@@ -60,7 +60,7 @@ const calculateSize = (
   const leftWidth = right - clientX;
   const bottomHeight = clientY - top;
   const topHeight = bottom - clientY;
-  const topOffset = clientY - container.offsetTop;
+  const topOffset = clientY - container.offsetTop + container.scrollTop;
   const leftOffset = clientX - container.offsetLeft;
   switch (direction) {
     case "top-left":
@@ -111,8 +111,13 @@ const startResize = (direction: ResizeDirection) => {
       }
     }
   };
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: MouseEvent) => {
     document.removeEventListener("mousemove", handleMove);
+    const size = calculateSize(direction, e, { left, right, top, bottom });
+    emit("update-position", { ...size, id: props.id });
+    nextTick(() => {
+      document.removeEventListener("mouseup", handleMouseUp);
+    });
   };
   document.addEventListener("mousemove", handleMove);
   document.addEventListener("mouseup", handleMouseUp);
